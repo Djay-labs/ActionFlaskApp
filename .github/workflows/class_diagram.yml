@@ -1,0 +1,39 @@
+name: Process Pull Request
+
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  process-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install Mermaid CLI
+        run: npm install -g @mermaid-js/mermaid-cli
+
+      - name: Convert Mermaid Markdown to SVG
+        run: mmdc -i input.mmd -o output.svg
+
+      - name: Create PR Comment File
+        run: echo "![Mermaid Image](output.svg)" > pr_description.txt
+
+      - name: Update PR Comment
+        run: |
+          PR_NUMBER=2
+          COMMENT_ID=1  # Replace with the ID of the comment you want to edit
+          COMMENT="New comment text"
+          URL="https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments/$COMMENT_ID"
+          RESPONSE=$(curl -L -X PATCH -H "Accept: application/vnd.github.v3+json" -H "Authorization: Bearer ${{ secrets.TOKEN }}" -H "X-GitHub-Api-Version: 2022-11-28" "$URL" -d "{\"body\":\"$COMMENT\"}")
+          echo "PR Comment Edit Response: $RESPONSE"
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
