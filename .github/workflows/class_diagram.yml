@@ -24,9 +24,10 @@ jobs:
       - name: Convert Mermaid Markdown to SVG
         run: mmdc -i input.mmd -o output.svg
 
+      - name: Create PR Comment File
+        run: echo "![Mermaid Image](output.svg)" > pr_description.txt
+
       - name: Display Image in PR Description
-        run: |
-          echo "![Mermaid Image](output.svg)" > pr_description.txt
-          gh pr review -c $GITHUB_SHA -b "Adding Mermaid Image" -F pr_description.txt
+        run: gh pr review -c $GITHUB_SHA --body-file pr_description.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
