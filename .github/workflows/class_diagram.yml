@@ -30,7 +30,9 @@ jobs:
       - name: Update PR Description
         run: |
           PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-          COMMENT=$(cat pr_description.txt | jq -Rs .)
-          curl -sSL -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/json" -X POST -d "{\"body\": $COMMENT}" "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments"
+          COMMENT=$(cat pr_description.txt)
+          URL="https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments"
+          RESPONSE=$(curl -sSL -H "Authorization: token $GITHUB_TOKEN" -d "{\"body\": \"$COMMENT\"}" -H "Content-Type: application/json" -X POST "$URL")
+          echo "PR Comment Response: $RESPONSE"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
