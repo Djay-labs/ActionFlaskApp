@@ -1,0 +1,5 @@
+classDiagram
+    BaseQueryClause: +qb_input()
+    BaseQueryClause <|-- SQLQueryClause
+    SQLQueryClause: +qb_input()
+    SQLQueryClause <|-- MySqlQueryClause

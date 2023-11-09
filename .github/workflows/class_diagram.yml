@@ -1,0 +1,32 @@
+name: Process Pull Request
+
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  process-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install Mermaid CLI
+        run: npm install -g @mermaid-js/mermaid-cli
+
+      - name: Convert Mermaid Markdown to SVG
+        run: mmdc -i input.mmd -o output.svg
+
+      - name: Display Image in PR Description
+        run: |
+          echo "![Mermaid Image](output.svg)" > pr_description.txt
+          gh pr review -c $GITHUB_SHA -b "Adding Mermaid Image" -F pr_description.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
